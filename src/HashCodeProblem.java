@@ -21,12 +21,12 @@ public class HashCodeProblem {
 		List<String> lines = Files.readAllLines(new File(fileName).toPath());
 
 		int numeroCacheUtilizzate = 0;
-		String inputData[] = getRow(lines);
-		int nVideo = Integer.valueOf(inputData[0]);
-		long nEndPoint = Long.valueOf(inputData[1]);
-		long nRequest = Long.valueOf(inputData[2]);
-		int nCacheServer = Integer.valueOf(inputData[3]);
-		long nMegaCache = Long.valueOf(inputData[4]);
+		String[] inputData = getRow(lines);
+		int nVideo = Integer.parseInt(inputData[0]);
+		long nEndPoint = Long.parseLong(inputData[1]);
+		long nRequest = Long.parseLong(inputData[2]);
+		int nCacheServer = Integer.parseInt(inputData[3]);
+		long nMegaCache = Long.parseLong(inputData[4]);
 
 		inputData = getRow(lines);
 		ArrayList<Integer> pesiVideo = new ArrayList<>();
@@ -46,8 +46,8 @@ public class HashCodeProblem {
 
 			for (int j = 0; j < endPoint.nCacheConnected; j++) {
 				inputData = getRow(lines);
-				int latenzaToCache = Integer.valueOf(inputData[1]);
-				int idCache = Integer.valueOf(inputData[0]);
+				int latenzaToCache = Integer.parseInt(inputData[1]);
+				int idCache = Integer.parseInt(inputData[0]);
 				endPoint.idCaches[j] = idCache;
 				endPoint.latenzeToCache[idCache] = endPoint.dataCenterLatency - latenzaToCache;
 			}
@@ -64,9 +64,9 @@ public class HashCodeProblem {
 
 		for (String line : lines) {
 			String[] requestDescription = line.split(" ");
-			int idVideo = Integer.valueOf(requestDescription[0]);
-			int idEndPoint = Integer.valueOf(requestDescription[1]);
-			int nRequestPartial = Integer.valueOf(requestDescription[2]);
+			int idVideo = Integer.parseInt(requestDescription[0]);
+			int idEndPoint = Integer.parseInt(requestDescription[1]);
+			int nRequestPartial = Integer.parseInt(requestDescription[2]);
 
 			int[] idCaches = endpoints.get(idEndPoint).idCaches;
 			for (int idCache : idCaches) {
