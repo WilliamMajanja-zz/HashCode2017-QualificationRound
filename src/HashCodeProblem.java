@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class HashCodeProblem {
 
-	public static final float ALPHA = 1f;
+	public static final float ALPHA = 0.5f;
 
 	public static void main(String[] args) throws IOException {
 		resolve("problem/data/me_at_the_zoo.in");
