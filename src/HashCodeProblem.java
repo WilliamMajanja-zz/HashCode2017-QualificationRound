@@ -11,10 +11,10 @@ public class HashCodeProblem {
 	public static final float ALPHA = 1f;
 
 	public static void main(String[] args) throws IOException {
-		resolve("me_at_the_zoo.in");
-		resolve("trending_today.in");
-		resolve("videos_worth_spreading.in");
-		resolve("kittens.in");
+		resolve("problem/data/me_at_the_zoo.in");
+		resolve("problem/data/trending_today.in");
+		resolve("problem/data/videos_worth_spreading.in");
+		resolve("problem/data/kittens.in");
 	}
 
 	public static void resolve(String fileName) throws IOException {
