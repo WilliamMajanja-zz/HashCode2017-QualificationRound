@@ -23,22 +23,16 @@ public class HashCodeProblem {
 		int numeroCacheUtilizzate = 0;
 		String inputData[] = getRow(lines);
 		int nVideo = Integer.valueOf(inputData[0]);
-		// System.out.println(nVideo);
 		long nEndPoint = Long.valueOf(inputData[1]);
-		// System.out.println(nEndPoint);
 		long nRequest = Long.valueOf(inputData[2]);
-		// System.out.println(nRequest);
 		int nCacheServer = Integer.valueOf(inputData[3]);
-		// System.out.println(nCacheServer);
 		long nMegaCache = Long.valueOf(inputData[4]);
-		// System.out.println(nMegaCache);
 
 		inputData = getRow(lines);
 		ArrayList<Integer> pesiVideo = new ArrayList<>();
 		for (String input : inputData) {
 			pesiVideo.add(Integer.valueOf(input));
 		}
-		// System.out.println(pesiVideo);
 
 		List<EndPoint> endpoints = new ArrayList<>();
 		for (int i = 0; i < nEndPoint; i++) {
@@ -59,8 +53,6 @@ public class HashCodeProblem {
 			}
 
 			endpoints.add(endPoint);
-
-			// System.out.println(endPoint);
 		}
 
 		CacheVideo[] cacheVideoArray = new CacheVideo[nCacheServer];
@@ -81,8 +73,6 @@ public class HashCodeProblem {
 				cacheVideoArray[idCache].risparmiVideo[idVideo] += calcolaPesoLocale(endpoints.get(idEndPoint),
 						nRequestPartial, idCache);
 			}
-			// System.out.println("request wooooww " + idVideo + " " +
-			// idEndPoint + " " + nRequestPartial);
 		}
 
 		int carlo = 0;
@@ -104,7 +94,6 @@ public class HashCodeProblem {
 
 			videos = videos.stream().sorted((v1, v2) -> Float.compare(v2.risparmio, v1.risparmio))
 					.collect(Collectors.toList());
-			// System.out.println(videos);
 
 			cache.videoScelti = new ArrayList<>();
 			int dimensioneOcc = 0;
@@ -138,7 +127,6 @@ public class HashCodeProblem {
 		}
 
 		out.close();
-		// System.out.println(numeroCacheUtilizzate);
 
 	}
 
