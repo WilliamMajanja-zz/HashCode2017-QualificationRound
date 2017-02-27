@@ -10,6 +10,10 @@ public class HashCodeProblem {
 
 	public static final float ALPHA = 0.5f;
 
+	private HashCodeProblem(){
+		super();
+	}
+	
 	public static void main(String[] args) throws IOException {
 		resolve("problem/data/me_at_the_zoo.in");
 		resolve("problem/data/trending_today.in");
@@ -20,7 +24,7 @@ public class HashCodeProblem {
 	public static void resolve(String fileName) throws IOException {
 		List<String> lines = Files.readAllLines(new File(fileName).toPath());
 
-		int numeroCacheUtilizzate = 0;
+		int numberCacheUsed = 0;
 		String[] inputData = getRow(lines);
 		int nVideo = Integer.parseInt(inputData[0]);
 		long nEndPoint = Long.parseLong(inputData[1]);
@@ -29,9 +33,9 @@ public class HashCodeProblem {
 		long nMegaCache = Long.parseLong(inputData[4]);
 
 		inputData = getRow(lines);
-		ArrayList<Integer> pesiVideo = new ArrayList<>();
+		ArrayList<Integer> weightVideos = new ArrayList<>();
 		for (String input : inputData) {
-			pesiVideo.add(Integer.valueOf(input));
+			weightVideos.add(Integer.valueOf(input));
 		}
 
 		List<EndPoint> endpoints = new ArrayList<>();
@@ -39,17 +43,20 @@ public class HashCodeProblem {
 			inputData = getRow(lines);
 
 			EndPoint endPoint = new EndPoint();
-			endPoint.dataCenterLatency = Integer.valueOf(inputData[0]);
-			endPoint.nCacheConnected = Integer.valueOf(inputData[1]);
-			endPoint.latenzeToCache = new int[nCacheServer];
-			endPoint.idCaches = new int[endPoint.nCacheConnected];
+			Integer dataCenterLatency = Integer.parseInt(inputData[0]);
+			endPoint.setDataCenterLatency(dataCenterLatency);
+			endPoint.setnCacheConnected(Integer.parseInt(inputData[1]));
+			int[] latenciesToCache = new int[nCacheServer];
+			endPoint.setLatenciesToCache(latenciesToCache);
+			int[] idCaches = new int[endPoint.getnCacheConnected()];
+			endPoint.setIdCaches(idCaches);
 
-			for (int j = 0; j < endPoint.nCacheConnected; j++) {
+			for (int j = 0; j < endPoint.getnCacheConnected(); j++) {
 				inputData = getRow(lines);
 				int latenzaToCache = Integer.parseInt(inputData[1]);
 				int idCache = Integer.parseInt(inputData[0]);
-				endPoint.idCaches[j] = idCache;
-				endPoint.latenzeToCache[idCache] = endPoint.dataCenterLatency - latenzaToCache;
+				idCaches[j] = idCache;
+				latenciesToCache[idCache] = dataCenterLatency - latenzaToCache;
 			}
 
 			endpoints.add(endPoint);
@@ -58,8 +65,7 @@ public class HashCodeProblem {
 		CacheVideo[] cacheVideoArray = new CacheVideo[nCacheServer];
 
 		for (int i = 0; i < cacheVideoArray.length; i++) {
-			cacheVideoArray[i] = new CacheVideo();
-			cacheVideoArray[i].risparmiVideo = new float[nVideo];
+			cacheVideoArray[i] = new CacheVideo(nVideo);
 		}
 
 		for (String line : lines) {
@@ -68,9 +74,9 @@ public class HashCodeProblem {
 			int idEndPoint = Integer.parseInt(requestDescription[1]);
 			int nRequestPartial = Integer.parseInt(requestDescription[2]);
 
-			int[] idCaches = endpoints.get(idEndPoint).idCaches;
+			int[] idCaches = endpoints.get(idEndPoint).getIdCaches();
 			for (int idCache : idCaches) {
-				cacheVideoArray[idCache].risparmiVideo[idVideo] += calcolaPesoLocale(endpoints.get(idEndPoint),
+				cacheVideoArray[idCache].getRisparmiVideo()[idVideo] += calculateLocalWeight(endpoints.get(idEndPoint),
 						nRequestPartial, idCache);
 			}
 		}
@@ -79,59 +85,58 @@ public class HashCodeProblem {
 		List<String> lineOut = new ArrayList<>();
 		PrintWriter out = new PrintWriter(fileName + ".out");
 		for (CacheVideo cache : cacheVideoArray) {
-			// Normalizzazione pesi
-			for (int i = 0; i < cache.risparmiVideo.length; i++) {
-				cache.risparmiVideo[i] = ALPHA * cache.risparmiVideo[i] / pesiVideo.get(i);
+
+			float[] risparmiVideo = cache.getRisparmiVideo();
+			// Normalization weight
+			for (int i = 0; i < risparmiVideo.length; i++) {
+				risparmiVideo[i] = ALPHA * risparmiVideo[i] / weightVideos.get(i);
 			}
 
 			List<Video> videos = new ArrayList<>();
-			for (int i = 0; i < cache.risparmiVideo.length; i++) {
-				Video video = new Video();
-				video.id = i;
-				video.risparmio = cache.risparmiVideo[i];
+			for (int i = 0; i < risparmiVideo.length; i++) {
+				Video video = new Video(i, risparmiVideo[i]);
 				videos.add(video);
 			}
 
-			videos = videos.stream().sorted((v1, v2) -> Float.compare(v2.risparmio, v1.risparmio))
+			videos = videos.stream().sorted((v1, v2) -> Float.compare(v2.getRisparmio(), v1.getRisparmio()))
 					.collect(Collectors.toList());
 
-			cache.videoScelti = new ArrayList<>();
-			int dimensioneOcc = 0;
+			List<Integer> videoChosen = cache.getVideoChosen();
+			int dimOcc = 0;
 			for (int i = 0; i < videos.size(); i++) {
 
-				int idVideoScelto = videos.get(i).id;
-				int dimensioneOccTemp = dimensioneOcc + pesiVideo.get(idVideoScelto);
+				int idVideoChosen = videos.get(i).getId();
+				int dimOccTemp = dimOcc + weightVideos.get(idVideoChosen);
 
-				if (dimensioneOccTemp < nMegaCache) {
-					cache.videoScelti.add(idVideoScelto);
-					dimensioneOcc = dimensioneOccTemp;
+				if (dimOccTemp < nMegaCache) {
+					videoChosen.add(idVideoChosen);
+					dimOcc = dimOccTemp;
 				}
 
 			}
 
-			if (cache.videoScelti.size() > 0) {
-				numeroCacheUtilizzate++;
+			if (!videoChosen.isEmpty()) {
+				numberCacheUsed++;
 				StringBuilder stringBuilder = new StringBuilder(String.valueOf(carlo));
-				for (int video : cache.videoScelti) {
+				for (int video : videoChosen) {
 					stringBuilder.append(" ").append(video);
 				}
 				lineOut.add(stringBuilder.toString());
 			}
 			carlo++;
-
 		}
 
-		out.println(numeroCacheUtilizzate);
+		// Print the result
+		out.println(numberCacheUsed);
 		for (String line : lineOut) {
 			out.println(line);
 		}
-
 		out.close();
 
 	}
 
-	private static int calcolaPesoLocale(EndPoint endPoint, int nRequestPartial, int idCache) {
-		return endPoint.latenzeToCache[idCache] * nRequestPartial;
+	private static int calculateLocalWeight(EndPoint endPoint, int nRequestPartial, int idCache) {
+		return endPoint.getLatenciesToCache()[idCache] * nRequestPartial;
 	}
 
 	private static String[] getRow(List<String> lines) {
